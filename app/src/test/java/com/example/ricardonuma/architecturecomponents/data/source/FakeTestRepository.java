@@ -9,8 +9,6 @@ import com.example.ricardonuma.architecturecomponents.data.source.Local.Note.Not
 
 import java.util.List;
 
-import rx.Single;
-
 public class FakeTestRepository implements Repository {
 
     private MutableLiveData<List<Note>> mNotes;
@@ -42,10 +40,9 @@ public class FakeTestRepository implements Repository {
     }
 
     @Override
-    public MutableLiveData<List<Note>> getAllNotes() {
+    public LiveData<List<Note>> getAllNotes() {
         return mNotes;
     }
-
 
 
     @Override
@@ -55,7 +52,7 @@ public class FakeTestRepository implements Repository {
 
     @Override
     public void updateGitHubUser(GitHubUser gitHubUser) {
-//        mGitHubUsers.set(gitHubUser);
+        mGitHubUsers.set(0, gitHubUser);
     }
 
     @Override
@@ -74,12 +71,12 @@ public class FakeTestRepository implements Repository {
     }
 
     @Override
-    public LiveData<List<GitHubUser>> usersCall(String since) {
-        return null;
+    public void getGitHubUsersRetrofit(MutableLiveData<List<GitHubUser>> liveDataGitHubUsers, String since) {
+
     }
 
     @Override
-    public Single<List<GitHubUser>> usersObservable(String since) {
-        return null;
+    public void getGitHubUsersRxJava(MutableLiveData<List<GitHubUser>> liveDataGitHubUsers, String since) {
+
     }
 }

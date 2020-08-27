@@ -1,6 +1,5 @@
 package com.example.ricardonuma.architecturecomponents.data.source.Remote;
 
-import com.example.ricardonuma.architecturecomponents.data.DataSource;
 import com.example.ricardonuma.architecturecomponents.data.source.Local.GitHubUser.GitHubUser;
 
 import java.util.List;
@@ -8,7 +7,6 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
-import rx.Observable;
 import rx.Single;
 
 public interface GitHubServices {
@@ -17,9 +15,9 @@ public interface GitHubServices {
 
     // RETROFIT
     @GET("users")
-    Call<List<GitHubUser>> usersCall(@Query("since") String since);
+    Call<List<GitHubUser>> getGitHubUsersRetrofit(@Query("since") String since);
 
     // RXJAVA
     @GET("users")
-    Single<List<GitHubUser>> usersObservable(@Query("since") String since);
+    Single<List<GitHubUser>> getGitHubUsersRxJava(@Query("since") String since);
 }

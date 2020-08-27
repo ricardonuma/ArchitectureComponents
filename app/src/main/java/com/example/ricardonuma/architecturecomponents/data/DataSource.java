@@ -9,7 +9,6 @@ import com.example.ricardonuma.architecturecomponents.data.source.Local.Note.Not
 import java.util.List;
 
 import retrofit2.http.Query;
-import rx.Single;
 
 public interface DataSource {
 
@@ -24,7 +23,7 @@ public interface DataSource {
 
     void deleteAllNotes();
 
-    MutableLiveData<List<Note>> getAllNotes();
+    LiveData<List<Note>> getAllNotes();
 
 
     // GitHubUser
@@ -42,7 +41,7 @@ public interface DataSource {
     // Remote Source
 
     // GitHubUser
-    LiveData<List<GitHubUser>> usersCall(@retrofit2.http.Query("since") String since);
+    void getGitHubUsersRetrofit(MutableLiveData<List<GitHubUser>> liveDataGitHubUsers, @Query("since") String since);
 
-    Single<List<GitHubUser>> usersObservable(@Query("since") String since);
+    void getGitHubUsersRxJava(MutableLiveData<List<GitHubUser>> liveDataGitHubUsers, @Query("since") String since);
 }

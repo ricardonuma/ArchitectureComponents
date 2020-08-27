@@ -8,8 +8,6 @@ import com.example.ricardonuma.architecturecomponents.data.source.Local.Note.Not
 
 import java.util.List;
 
-import rx.Single;
-
 public interface Repository {
     void insertNote(Note note);
 
@@ -19,7 +17,7 @@ public interface Repository {
 
     void deleteAllNotes();
 
-    MutableLiveData<List<Note>> getAllNotes();
+    LiveData<List<Note>> getAllNotes();
 
 
     void insertGitHubUser(GitHubUser gitHubUser);
@@ -32,7 +30,8 @@ public interface Repository {
 
     List<GitHubUser> getAllGitHubUsers();
 
-    LiveData<List<GitHubUser>> usersCall(String since);
 
-    Single<List<GitHubUser>> usersObservable(String since);
+    void getGitHubUsersRetrofit(MutableLiveData<List<GitHubUser>> liveDataGitHubUsers, String since);
+
+    void getGitHubUsersRxJava(MutableLiveData<List<GitHubUser>> liveDataGitHubUsers, String since);
 }

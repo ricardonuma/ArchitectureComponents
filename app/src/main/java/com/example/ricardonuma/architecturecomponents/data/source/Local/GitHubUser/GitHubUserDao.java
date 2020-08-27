@@ -12,13 +12,13 @@ import java.util.List;
 public interface GitHubUserDao {
 
     @Insert
-    void insert(GitHubUser gitHubUser);
+    void insertGitHubUser(GitHubUser gitHubUser);
 
     @Update
-    void update(GitHubUser gitHubUser);
+    void updateGitHubUser(GitHubUser gitHubUser);
 
     @Delete
-    void delete(GitHubUser gitHubUser);
+    void deleteGitHubUser(GitHubUser gitHubUser);
 
     @Query("DELETE FROM github_user_table")
     void deleteAllGitHubUsers();

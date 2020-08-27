@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -20,11 +19,6 @@ import com.example.ricardonuma.architecturecomponents.data.DefaultRepository;
 import com.example.ricardonuma.architecturecomponents.data.source.Local.GitHubUser.GitHubUser;
 
 import java.util.List;
-
-import rx.Single;
-import rx.SingleSubscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 public class GitHubRepositoriesFragment extends Fragment {
 
@@ -73,7 +67,7 @@ public class GitHubRepositoriesFragment extends Fragment {
         GitHubUserViewModelFactory gitHubUserViewModelFactory =
                 new GitHubUserViewModelFactory(DefaultRepository.getRepository(requireActivity().getApplication()));
         mGitHubUserViewModel = ViewModelProviders.of(this, gitHubUserViewModelFactory).get(GitHubUserViewModel.class);
-        mGitHubUserViewModel.getLiveDataAllGitHubUsers().observe(getActivity(), new androidx.lifecycle.Observer<List<GitHubUser>>() {
+        mGitHubUserViewModel.observeAllGitHubUsers().observe(getActivity(), new androidx.lifecycle.Observer<List<GitHubUser>>() {
             @Override
             public void onChanged(@Nullable List<GitHubUser> gitHubUsers) {
                 mGitHubUserAdapter.setGitHubUsers(gitHubUsers);
@@ -82,66 +76,10 @@ public class GitHubRepositoriesFragment extends Fragment {
     }
 
     private void retrofit() {
-
-        // RETROFIT
-//        Retrofit retrofit = new Retrofit.Builder()
-//                .addConverterFactory(GsonConverterFactory.create())
-//                .baseUrl(GitHubServices.GITHUB_API_BASE_URL)
-//                .build();
-
-//        GitHubServices githubServices = retrofit.create(GitHubServices.class);
-
-//        Call<List<GitHubUser>> call = githubServices.usersCall(SINCE);
-//
-//        call.enqueue(new Callback<List<GitHubUser>>() {
-//            @Override
-//            public void onResponse(Call<List<GitHubUser>> call, Response<List<GitHubUser>> response) {
-//                for (int i = 0; i < response.body().size(); i++) {
-//                    mGitHubUserViewModel.insert(response.body().get(i));
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<List<GitHubUser>> call, Throwable t) {
-//                Toast.makeText(getActivity(),
-//                        "Erro: " + t.getMessage(), Toast.LENGTH_LONG).show();
-//            }
-//        });
-
-        mGitHubUserViewModel.usersCall(SINCE);
+        mGitHubUserViewModel.getGitHubUsersRetrofit(SINCE);
     }
 
     private void rxjava() {
-
-        // RETROFIT + RXJAVA
-//        Retrofit retrofit = new Retrofit.Builder()
-//                .addConverterFactory(GsonConverterFactory.create())
-//                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-//                .baseUrl(GitHubServices.GITHUB_API_BASE_URL)
-//                .build();
-
-//        GitHubServices githubServices = retrofit.create(GitHubServices.class);
-
-        Single<List<GitHubUser>> observable = mGitHubUserViewModel.usersObservable(SINCE);
-
-        observable
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SingleSubscriber<List<GitHubUser>>() {
-                    @Override
-                    public void onError(Throwable e) {
-                        Toast.makeText(getActivity(),
-                                "Erro: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void onSuccess(List<GitHubUser> gitHubUsers) {
-                        for (int i = 0; i < gitHubUsers.size(); i++) {
-                            mGitHubUserViewModel.insert(gitHubUsers.get(i));
-                        }
-                    }
-                });
-
-//        mGitHubUserViewModel.usersObservable(SINCE);
+        mGitHubUserViewModel.getGitHubUsersRxJava(SINCE);
     }
 }

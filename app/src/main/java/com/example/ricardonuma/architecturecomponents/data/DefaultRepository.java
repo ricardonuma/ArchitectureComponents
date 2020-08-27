@@ -13,8 +13,6 @@ import com.example.ricardonuma.architecturecomponents.data.source.Remote.RemoteD
 
 import java.util.List;
 
-import rx.Single;
-
 public class DefaultRepository implements Repository {
 
     private static DefaultRepository INSTANCE;
@@ -57,7 +55,7 @@ public class DefaultRepository implements Repository {
     }
 
     @Override
-    public MutableLiveData<List<Note>> getAllNotes() {
+    public LiveData<List<Note>> getAllNotes() {
         return mLocalDataSource.getAllNotes();
     }
 
@@ -89,12 +87,12 @@ public class DefaultRepository implements Repository {
 
 
     @Override
-    public LiveData<List<GitHubUser>> usersCall(String since) {
-        return mRemoteDataSource.usersCall(since);
+    public void getGitHubUsersRetrofit(MutableLiveData<List<GitHubUser>> liveDataGitHubUsers, String since) {
+        mRemoteDataSource.getGitHubUsersRetrofit(liveDataGitHubUsers, since);
     }
 
     @Override
-    public Single<List<GitHubUser>> usersObservable(String since) {
-        return mRemoteDataSource.usersObservable(since);
+    public void getGitHubUsersRxJava(MutableLiveData<List<GitHubUser>> liveDataGitHubUsers, String since) {
+        mRemoteDataSource.getGitHubUsersRxJava(liveDataGitHubUsers, since);
     }
 }

@@ -13,16 +13,12 @@ import com.example.ricardonuma.architecturecomponents.data.source.Local.GitHubUs
 import com.example.ricardonuma.architecturecomponents.data.source.Local.Note.Note;
 import com.example.ricardonuma.architecturecomponents.data.source.Local.Note.NoteDao;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import rx.Single;
 
 public class LocalDataSource implements DataSource {
 
-    private NoteDao mNoteDao;
-    private GitHubUserDao mGitHubUserDao;
-    private static MutableLiveData<List<Note>> mAllNotes = new MutableLiveData<>();
+    private static NoteDao mNoteDao;
+    private static GitHubUserDao mGitHubUserDao;
 
     public LocalDataSource(NoteDao noteDao, GitHubUserDao gitHubUserDao) {
         this.mNoteDao = noteDao;
@@ -32,38 +28,32 @@ public class LocalDataSource implements DataSource {
 
     @Override
     public void insertNote(Note note) {
-        new insertNoteAsyncTask(mNoteDao).execute(note);
+        new insertNoteAsyncTask().execute(note);
     }
 
     @Override
     public void updateNote(Note note) {
-        new updateNoteAsyncTask(mNoteDao).execute(note);
+        new updateNoteAsyncTask().execute(note);
     }
 
     @Override
     public void deleteNote(Note note) {
-        new deleteNoteAsyncTask(mNoteDao).execute(note);
+        new deleteNoteAsyncTask().execute(note);
     }
 
     @Override
     public void deleteAllNotes() {
-        new deleteAllNotesAsyncTask(mNoteDao).execute();
+        new deleteAllNotesAsyncTask().execute();
     }
 
     @Override
-    public MutableLiveData<List<Note>> getAllNotes() {
-        new getAllNotesAsyncTask(mNoteDao).execute();
-        return mAllNotes;
+    public LiveData<List<Note>> getAllNotes() {
+        return mNoteDao.getAllNotes();
     }
 
 
     private static class insertNoteAsyncTask extends AsyncTask<Note, Void, Void> {
         private static final String ROOM_ERROR = "ROOM ERROR";
-        private NoteDao mNoteDao;
-
-        private insertNoteAsyncTask(NoteDao noteDao) {
-            this.mNoteDao = noteDao;
-        }
 
         @Override
         protected Void doInBackground(Note... notes) {
@@ -77,12 +67,6 @@ public class LocalDataSource implements DataSource {
     }
 
     private static class updateNoteAsyncTask extends AsyncTask<Note, Void, Void> {
-        private NoteDao mNoteDao;
-
-        private updateNoteAsyncTask(NoteDao noteDao) {
-            this.mNoteDao = noteDao;
-        }
-
         @Override
         protected Void doInBackground(Note... notes) {
             mNoteDao.update(notes[0]);
@@ -91,12 +75,6 @@ public class LocalDataSource implements DataSource {
     }
 
     private static class deleteNoteAsyncTask extends AsyncTask<Note, Void, Void> {
-        private NoteDao mNoteDao;
-
-        private deleteNoteAsyncTask(NoteDao noteDao) {
-            this.mNoteDao = noteDao;
-        }
-
         @Override
         protected Void doInBackground(Note... notes) {
             mNoteDao.delete(notes[0]);
@@ -105,12 +83,6 @@ public class LocalDataSource implements DataSource {
     }
 
     private static class deleteAllNotesAsyncTask extends AsyncTask<Void, Void, Void> {
-        private NoteDao mNoteDao;
-
-        private deleteAllNotesAsyncTask(NoteDao noteDao) {
-            this.mNoteDao = noteDao;
-        }
-
         @Override
         protected Void doInBackground(Void... voids) {
             mNoteDao.deleteAllNotes();
@@ -118,44 +90,25 @@ public class LocalDataSource implements DataSource {
         }
     }
 
-    private static class getAllNotesAsyncTask extends AsyncTask<Void, Void, List<Note>> {
-        private NoteDao mNoteDao;
-
-        private getAllNotesAsyncTask(NoteDao noteDao) {
-            this.mNoteDao = noteDao;
-        }
-
-        @Override
-        protected List<Note> doInBackground(Void... voids) {
-            return mNoteDao.getAllNotes();
-        }
-
-        @Override
-        protected void onPostExecute(List<Note> notes) {
-            super.onPostExecute(notes);
-            mAllNotes.setValue(notes);
-        }
-    }
-
 
     @Override
     public void insertGitHubUser(GitHubUser gitHubUser) {
-        mGitHubUserDao.insert(gitHubUser);
+        new insertGitHubUserAsyncTask().execute(gitHubUser);
     }
 
     @Override
     public void updateGitHubUser(GitHubUser gitHubUser) {
-        mGitHubUserDao.update(gitHubUser);
+        new updateGitHubUserAsyncTask().execute(gitHubUser);
     }
 
     @Override
     public void deleteGitHubUser(GitHubUser gitHubUser) {
-        mGitHubUserDao.delete(gitHubUser);
+        new deleteGitHubUserAsyncTask().execute(gitHubUser);
     }
 
     @Override
     public void deleteAllGitHubUsers() {
-        mGitHubUserDao.deleteAllGitHubUsers();
+        new deleteAllGitHubUsersAsyncTask().execute();
     }
 
     @Override
@@ -163,14 +116,52 @@ public class LocalDataSource implements DataSource {
         return mGitHubUserDao.getAllGitHubUsers();
     }
 
+    private static class insertGitHubUserAsyncTask extends AsyncTask<GitHubUser, Void, Void> {
+        private static final String ROOM_ERROR = "ROOM ERROR";
+
+        @Override
+        protected Void doInBackground(GitHubUser... gitHubUsers) {
+            try {
+                mGitHubUserDao.insertGitHubUser(gitHubUsers[0]);
+            } catch (SQLiteConstraintException e) {
+                Log.e(ROOM_ERROR, e.getMessage());
+            }
+            return null;
+        }
+    }
+
+    private static class updateGitHubUserAsyncTask extends AsyncTask<GitHubUser, Void, Void> {
+        @Override
+        protected Void doInBackground(GitHubUser... gitHubUsers) {
+            mGitHubUserDao.updateGitHubUser(gitHubUsers[0]);
+            return null;
+        }
+    }
+
+    private static class deleteGitHubUserAsyncTask extends AsyncTask<GitHubUser, Void, Void> {
+        @Override
+        protected Void doInBackground(GitHubUser... gitHubUsers) {
+            mGitHubUserDao.deleteGitHubUser(gitHubUsers[0]);
+            return null;
+        }
+    }
+
+    private static class deleteAllGitHubUsersAsyncTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            mGitHubUserDao.deleteAllGitHubUsers();
+            return null;
+        }
+    }
+
 
     @Override
-    public LiveData<List<GitHubUser>> usersCall(String since) {
-        return null;
+    public void getGitHubUsersRetrofit(MutableLiveData<List<GitHubUser>> liveDataGitHubUsers, String since) {
+
     }
 
     @Override
-    public Single<List<GitHubUser>> usersObservable(String since) {
-        return null;
+    public void getGitHubUsersRxJava(MutableLiveData<List<GitHubUser>> liveDataGitHubUsers, String since) {
+
     }
 }

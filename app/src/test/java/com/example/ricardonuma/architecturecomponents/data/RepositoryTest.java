@@ -1,6 +1,7 @@
 package com.example.ricardonuma.architecturecomponents.data;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.ricardonuma.architecturecomponents.data.source.FakeDataSource;
@@ -34,7 +35,6 @@ public class RepositoryTest {
     List<Note> mNotes = new ArrayList<>();
     MutableLiveData<List<Note>> mLiveDataNotes = new MutableLiveData<>();
     List<GitHubUser> mGitHubUsers = new ArrayList<>();
-
     MutableLiveData<List<GitHubUser>> mLiveDataGitHubUsers = new MutableLiveData<>();
 
     DefaultRepository mRepository;
@@ -67,9 +67,9 @@ public class RepositoryTest {
         mGitHubUsers.add(mGitHubUser1);
         mGitHubUsers.add(mGitHubUser2);
 
-        mLocalDataSource = new FakeDataSource(mLiveDataNotes, mGitHubUsers);
-
         mLiveDataGitHubUsers.setValue(mGitHubUsers);
+
+        mLocalDataSource = new FakeDataSource(mLiveDataNotes, mGitHubUsers);
 
         mRemoteDataSource = new FakeDataSource(mLiveDataGitHubUsers);
 
@@ -114,9 +114,9 @@ public class RepositoryTest {
 
     @Test
     public void getAllNotes_getAllNotesFromLocalDataSource() {
-        MutableLiveData<List<Note>> notes = mRepository.getAllNotes();
+        LiveData<List<Note>> liveDataNotes = mRepository.getAllNotes();
 
-        assertThat(notes, is(mLiveDataNotes));
+        assertThat(liveDataNotes.getValue(), is(mLiveDataNotes.getValue()));
     }
 
     @Test
@@ -159,20 +159,20 @@ public class RepositoryTest {
     public void getAllGitHubUsers_getAllGitHubUsersFromLocalDataSource() {
         List<GitHubUser> gitHubUsers = mRepository.getAllGitHubUsers();
 
-        assertThat(gitHubUsers, is(mGitHubUsers));
+        assertThat(gitHubUsers, is(mLiveDataGitHubUsers.getValue()));
     }
 
     @Test
     public void usersCall_requestsAllGitHubUsersFromRemoteDataSource() {
-//        LiveData<List<GitHubUser>> gitHubUsers = mRepository.usersCall(SINCE);
-//
-//        assertThat(gitHubUsers.getValue(), is(mGitHubUsers));
+        mRepository.getGitHubUsersRetrofit(mLiveDataGitHubUsers, SINCE);
+
+        assertThat(mLiveDataGitHubUsers.getValue(), is(mGitHubUsers));
     }
 
     @Test
     public void usersObservable_requestsAllGitHubUsersFromRemoteDataSource() {
-//        LiveData<List<GitHubUser>> gitHubUsers = mRepository.usersObservable(SINCE);
-//
-//        assertThat(gitHubUsers.getValue(), is(mGitHubUsers));
+        mRepository.getGitHubUsersRxJava(mLiveDataGitHubUsers, SINCE);
+
+        assertThat(mLiveDataGitHubUsers.getValue(), is(mGitHubUsers));
     }
 }

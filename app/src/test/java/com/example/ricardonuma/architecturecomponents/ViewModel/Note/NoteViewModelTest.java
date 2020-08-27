@@ -16,11 +16,11 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.ricardonuma.architecturecomponents.LiveDataTestUtil.getOrAwaitValue;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 public class NoteViewModelTest {
@@ -37,8 +37,6 @@ public class NoteViewModelTest {
     MutableLiveData<List<Note>> mNotes = new MutableLiveData<>();
     List<Note> mNoteList = new ArrayList<>();
     List<GitHubUser> mGitHubUsers = new ArrayList<>();
-
-    MutableLiveData<List<GitHubUser>> mLiveDataGitHubUsers = new MutableLiveData<>();
 
     // Executes each task synchronously using Architecture Components.
     @Rule
@@ -57,16 +55,16 @@ public class NoteViewModelTest {
     }
 
     @Test
-    public void insert() {
+    public void insertNote_insertNoteFromRepository() {
         // When adding a new note
         mNoteViewModel.insertNote(mNewNote);
 
-        // Then the new task event is triggered
+        // Then the new note event is triggered
         assertThat(mNotes.getValue(), hasItem(mNewNote));
     }
 
     @Test
-    public void update() {
+    public void updateNote_updateNoteFromRepository() {
         mNote2.setTitle("title3");
         mNote2.setDescription("description3");
         mNote2.setPriority(3);
@@ -81,29 +79,29 @@ public class NoteViewModelTest {
     }
 
     @Test
-    public void delete() {
+    public void deleteNote_deleteNoteFromRepository() {
         // When adding a new note
-        mNoteViewModel.deleteNote(mNewNote);
+        mNoteViewModel.deleteNote(mNote2);
 
-        // Then the new task event is triggered
-        assertThat(mNotes.getValue(), not(hasItem(mNewNote)));
+        // Then the new note event is triggered
+        assertThat(mNotes.getValue(), not(hasItem(mNote2)));
     }
 
     @Test
-    public void deleteAllNotes() {
+    public void deleteAllNotes_deleteAllNotesFromRepository() {
         // When adding a new note
         mNoteViewModel.deleteAllNotes();
 
-        // Then the new task event is triggered
+        // Then the new note event is triggered
         assertThat(mNotes.getValue(), is(Matchers.<Note>empty()));
     }
 
     @Test
-    public void getAllNotes() {
+    public void getAllNotes_getAllNotesFromRepository_returnAllNotes() throws InterruptedException {
         // When adding a new note
-        MutableLiveData<List<Note>> notes = mNoteViewModel.getAllNotes();
+        LiveData<List<Note>> liveDataNotes = mNoteViewModel.getAllNotes();
 
-        // Then the new task event is triggered
-        assertThat(notes, is(mNotes));
+        // Then the new note event is triggered
+        assertThat(getOrAwaitValue(liveDataNotes), is(mNotes.getValue()));
     }
 }

@@ -17,7 +17,9 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-import rx.Single;
+import rx.SingleSubscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class RemoteDataSource implements DataSource {
 
@@ -25,7 +27,6 @@ public class RemoteDataSource implements DataSource {
     GitHubServices mGithubServicesRxJava;
 
     public RemoteDataSource() {
-
         Retrofit retrofit = new Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
@@ -65,10 +66,9 @@ public class RemoteDataSource implements DataSource {
     }
 
     @Override
-    public MutableLiveData<List<Note>> getAllNotes() {
+    public LiveData<List<Note>> getAllNotes() {
         return null;
     }
-
 
 
     @Override
@@ -96,34 +96,45 @@ public class RemoteDataSource implements DataSource {
         return null;
     }
 
+
     @Override
-    public LiveData<List<GitHubUser>> usersCall(String since) {
-//        return mGithubServicesRetrofit.usersCall(since);
-
-        final MutableLiveData<List<GitHubUser>> liveDataGitHubUsers = new MutableLiveData<>();
-
-        Call<List<GitHubUser>> call = mGithubServicesRetrofit.usersCall(since);
-
-        call.enqueue(new Callback<List<GitHubUser>>() {
-            @Override
-            public void onResponse(Call<List<GitHubUser>> call, Response<List<GitHubUser>> response) {
+    public void getGitHubUsersRetrofit(final MutableLiveData<List<GitHubUser>> liveDataGitHubUsers, String since) {
+        mGithubServicesRetrofit.getGitHubUsersRetrofit(since)
+                .enqueue(new Callback<List<GitHubUser>>() {
+                    @Override
+                    public void onResponse(Call<List<GitHubUser>> call, Response<List<GitHubUser>> response) {
 //                for (int i = 0; i < response.body().size(); i++) {
-//                    mGitHubUserViewModel.insert(response.body().get(i));
+//                    gitHubUserViewModel.insert(response.body().get(i));
 //                }
-                liveDataGitHubUsers.setValue(response.body());
-            }
+//                new GitHubUserViewModel.getAllGitHubUsersAsyncTask().execute();
+                        liveDataGitHubUsers.setValue(response.body());
+                    }
 
-            @Override
-            public void onFailure(Call<List<GitHubUser>> call, Throwable e) {
-                Log.e("Erro: ", e.getMessage());
-            }
-        });
-
-        return liveDataGitHubUsers;
+                    @Override
+                    public void onFailure(Call<List<GitHubUser>> call, Throwable e) {
+                        Log.e("Erro: ", e.getMessage());
+                    }
+                });
     }
 
     @Override
-    public Single<List<GitHubUser>> usersObservable(String since) {
-        return mGithubServicesRxJava.usersObservable(since);
+    public void getGitHubUsersRxJava(final MutableLiveData<List<GitHubUser>> liveDataGitHubUsers, String since) {
+        mGithubServicesRxJava.getGitHubUsersRxJava(since)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleSubscriber<List<GitHubUser>>() {
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("Erro: ", e.getMessage());
+                    }
+
+                    @Override
+                    public void onSuccess(List<GitHubUser> gitHubUsers) {
+//                        for (int i = 0; i < gitHubUsers.size(); i++) {
+//                            mGitHubUserViewModel.insert(gitHubUsers.get(i));
+//                        }
+                        liveDataGitHubUsers.setValue(gitHubUsers);
+                    }
+                });
     }
 }

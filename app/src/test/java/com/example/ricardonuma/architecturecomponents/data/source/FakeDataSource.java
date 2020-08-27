@@ -9,21 +9,19 @@ import com.example.ricardonuma.architecturecomponents.data.source.Local.Note.Not
 
 import java.util.List;
 
-import rx.Single;
-
 public class FakeDataSource implements DataSource {
 
     private MutableLiveData<List<Note>> mNotes;
     private List<GitHubUser> mGitHubUsers;
-    private LiveData<List<GitHubUser>> mLiveDataGitHubUsers;
+    private MutableLiveData<List<GitHubUser>> mLiveDataGitHubUsers;
 
     public FakeDataSource(MutableLiveData<List<Note>> notes, List<GitHubUser> gitHubUsers) {
         this.mNotes = notes;
         this.mGitHubUsers = gitHubUsers;
     }
 
-    public FakeDataSource(LiveData<List<GitHubUser>> liveDataGitHubUsers) {
-        this.mLiveDataGitHubUsers = liveDataGitHubUsers;
+    public FakeDataSource(MutableLiveData<List<GitHubUser>> gitHubUsers) {
+        this.mLiveDataGitHubUsers = gitHubUsers;
     }
 
     @Override
@@ -47,7 +45,7 @@ public class FakeDataSource implements DataSource {
     }
 
     @Override
-    public MutableLiveData<List<Note>> getAllNotes() {
+    public LiveData<List<Note>> getAllNotes() {
         return mNotes;
     }
 
@@ -77,13 +75,14 @@ public class FakeDataSource implements DataSource {
         return mGitHubUsers;
     }
 
+
     @Override
-    public LiveData<List<GitHubUser>> usersCall(String since) {
-        return mLiveDataGitHubUsers;
+    public void getGitHubUsersRetrofit(MutableLiveData<List<GitHubUser>> liveDataGitHubUsers, String since) {
+
     }
 
     @Override
-    public Single<List<GitHubUser>> usersObservable(String since) {
-        return null;
+    public void getGitHubUsersRxJava(MutableLiveData<List<GitHubUser>> liveDataGitHubUsers, String since) {
+
     }
 }
