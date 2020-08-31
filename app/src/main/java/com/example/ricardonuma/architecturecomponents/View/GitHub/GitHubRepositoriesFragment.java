@@ -12,10 +12,10 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.ricardonuma.architecturecomponents.MyApplication;
 import com.example.ricardonuma.architecturecomponents.R;
 import com.example.ricardonuma.architecturecomponents.ViewModel.GitHubUser.GitHubUserViewModel;
 import com.example.ricardonuma.architecturecomponents.ViewModel.GitHubUser.GitHubUserViewModelFactory;
-import com.example.ricardonuma.architecturecomponents.data.DefaultRepository;
 import com.example.ricardonuma.architecturecomponents.data.source.Local.GitHubUser.GitHubUser;
 
 import java.util.List;
@@ -65,7 +65,7 @@ public class GitHubRepositoriesFragment extends Fragment {
         mRecyclerView.setAdapter(mGitHubUserAdapter);
 
         GitHubUserViewModelFactory gitHubUserViewModelFactory =
-                new GitHubUserViewModelFactory(DefaultRepository.getRepository(requireActivity().getApplication()));
+                new GitHubUserViewModelFactory(((MyApplication) requireContext().getApplicationContext()).getRepository());
         mGitHubUserViewModel = ViewModelProviders.of(this, gitHubUserViewModelFactory).get(GitHubUserViewModel.class);
         mGitHubUserViewModel.observeAllGitHubUsers().observe(getActivity(), new androidx.lifecycle.Observer<List<GitHubUser>>() {
             @Override

@@ -14,10 +14,10 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.ricardonuma.architecturecomponents.MyApplication;
 import com.example.ricardonuma.architecturecomponents.R;
 import com.example.ricardonuma.architecturecomponents.ViewModel.Note.NoteViewModel;
 import com.example.ricardonuma.architecturecomponents.ViewModel.Note.NoteViewModelFactory;
-import com.example.ricardonuma.architecturecomponents.data.DefaultRepository;
 import com.example.ricardonuma.architecturecomponents.data.source.Local.Note.Note;
 
 import java.util.List;
@@ -46,7 +46,7 @@ public class NoteListFragment extends Fragment {
         mRecyclerView.setAdapter(noteAdapter);
 
         NoteViewModelFactory noteViewModelFactory =
-                new NoteViewModelFactory(DefaultRepository.getRepository(requireActivity().getApplication()));
+                new NoteViewModelFactory(((MyApplication) requireContext().getApplicationContext()).getRepository());
         mNoteViewModel = ViewModelProviders.of(this, noteViewModelFactory).get(NoteViewModel.class);
         mNoteViewModel.getAllNotes().observe(this, new Observer<List<Note>>() {
             @Override

@@ -1,21 +1,14 @@
 package com.example.ricardonuma.architecturecomponents.data;
 
-import android.content.Context;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.ricardonuma.architecturecomponents.data.source.Local.GitHubUser.GitHubUser;
-import com.example.ricardonuma.architecturecomponents.data.source.Local.LocalDataSource;
 import com.example.ricardonuma.architecturecomponents.data.source.Local.Note.Note;
-import com.example.ricardonuma.architecturecomponents.data.source.Local.RoomDatabase;
-import com.example.ricardonuma.architecturecomponents.data.source.Remote.RemoteDataSource;
 
 import java.util.List;
 
 public class DefaultRepository implements Repository {
-
-    private static DefaultRepository INSTANCE;
 
     DataSource mLocalDataSource;
     DataSource mRemoteDataSource;
@@ -23,15 +16,6 @@ public class DefaultRepository implements Repository {
     public DefaultRepository(DataSource localDataSource, DataSource remoteDataSource) {
         mLocalDataSource = localDataSource;
         mRemoteDataSource = remoteDataSource;
-    }
-
-    public static DefaultRepository getRepository(Context context) {
-        if (INSTANCE == null) {
-            RoomDatabase database = RoomDatabase.getInstance(context);
-            INSTANCE = new DefaultRepository(new LocalDataSource(database.noteDao(), database.gitHubUserDao()), new RemoteDataSource());
-        }
-
-        return INSTANCE;
     }
 
     @Override

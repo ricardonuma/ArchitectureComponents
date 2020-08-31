@@ -1,50 +1,58 @@
-//package com.example.ricardonuma.architecturecomponents.View.Note;
-//
-//import androidx.test.ext.junit.runners.AndroidJUnit4;
-//
-//import androidx.test.rule.ActivityTestRule;
-//import com.example.ricardonuma.architecturecomponents.R;
-//import com.example.ricardonuma.architecturecomponents.View.MainActivity;
-//
-//import org.junit.Before;
-//import org.junit.Rule;
-//import org.junit.Test;
-//import org.junit.runner.RunWith;
-//
-//import static androidx.test.espresso.Espresso.onView;
-//import static androidx.test.espresso.action.ViewActions.click;
-//import static androidx.test.espresso.assertion.ViewAssertions.matches;
-//import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
-//import static androidx.test.espresso.matcher.ViewMatchers.withId;
-//import static androidx.test.espresso.matcher.ViewMatchers.withText;
-//
-//@RunWith(AndroidJUnit4.class)
-//public class NoteListFragmentTest {
-//
-//    @Rule
-//    public ActivityTestRule<MainActivity> activityActivityTestRule = new ActivityTestRule<MainActivity>(MainActivity.class);
-//
-//
-//    @Before
-//    public void init(){
-//        activityActivityTestRule.getActivity()
-//                .getSupportFragmentManager().beginTransaction();
-//    }
-//
-//    @Test
-//    public void shouldUpdateTextAfterButtonClick() {
-//
-//        onView(withId(R.id.recycler_view))
-//                .check(matches(isDisplayed()));
-//
-//        onView(withId(R.id.next))
-//                .check(matches(isDisplayed()));
-//
-//        onView(withId(R.id.next))
-//                .check(matches(withText("Next")));
-//
-////        onView(withId(R.id.next)).perform(click());
-////
-////        onView(withId(R.id.text)).check(matches(withText("Hello World!")));
-//    }
-//}
+package com.example.ricardonuma.architecturecomponents.View.Note;
+
+import android.os.Bundle;
+import android.test.suitebuilder.annotation.MediumTest;
+
+import androidx.fragment.app.testing.FragmentScenario;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+
+import com.example.ricardonuma.architecturecomponents.R;
+import com.example.ricardonuma.architecturecomponents.ServiceLocator;
+import com.example.ricardonuma.architecturecomponents.data.Repository;
+import com.example.ricardonuma.architecturecomponents.data.source.FakeAndroidTestRepository;
+import com.example.ricardonuma.architecturecomponents.data.source.Local.Note.Note;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@MediumTest
+@RunWith(AndroidJUnit4.class)
+public class NoteListFragmentTest {
+
+    private Repository repository;
+
+    @Before
+    public void initRepository() {
+        Note mNote1 = new Note("title1", "description1", 1);
+        Note mNote2 = new Note("title2", "description2", 2);
+        Note mNewNote = new Note("title3", "description3", 3);
+        List<Note> mNoteList = new ArrayList<>();
+        mNoteList.add(mNote1);
+        mNoteList.add(mNote2);
+//        repository.insertNote(mNote1);
+//        repository.insertNote(mNote2);
+
+        repository = new FakeAndroidTestRepository(mNoteList);
+
+        ServiceLocator.setRepository(repository);
+    }
+
+    @After
+    public void cleanupDb() {
+        ServiceLocator.resetRepository();
+    }
+
+    @Test
+    public void activeNoteList_DisplayedInUi() throws InterruptedException {
+        // WHEN - Details fragment launched to display task
+        Bundle bundle = new NoteListFragmentArgs().toBundle();
+        FragmentScenario.launchInContainer(NoteListFragment.class, bundle, R.style.AppTheme, null);
+
+        Thread.sleep(3000);
+    }
+}
